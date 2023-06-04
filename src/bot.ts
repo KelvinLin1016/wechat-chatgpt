@@ -129,6 +129,7 @@ export class ChatGPTBot {
     // remove more text via - - - - - - - - - - - - - - -
     return text
   }
+
   async getGPTMessage(talkerName: string,text: string): Promise<string> {
     let gptMessage = await chatgpt(talkerName,text);
     if (gptMessage !=="") {
@@ -219,6 +220,7 @@ export class ChatGPTBot {
     await this.trySay(talker, gptMessage);
   }
 
+  // Group message 
   async onGroupMessage(
     talker: ContactInterface,
     text: string,
@@ -228,6 +230,8 @@ export class ChatGPTBot {
     const result = `@${talker.name()} ${text}\n\n------\n ${gptMessage}`;
     await this.trySay(room, result);
   }
+
+  // Private message
   async onMessage(message: Message) {
     const talker = message.talker();
     const rawText = message.text();
@@ -257,6 +261,8 @@ export class ChatGPTBot {
       })
       return;
     }
+
+    // Run some specific command
     if (rawText.startsWith("/cmd ")){
       console.log(`🤖 Command: ${rawText}`)
       const cmdContent = rawText.slice(5) // 「/cmd 」一共5个字符(注意空格)
@@ -268,9 +274,10 @@ export class ChatGPTBot {
       return;
     }
     // 使用DallE生成图片
-    if (rawText.startsWith("/img")){
+    if (rawText.includes("画")){
       console.log(`🤖 Image: ${rawText}`)
-      const imgContent = rawText.slice(4)
+      // const imgContent = rawText.slice(4)
+      const imgContent = rawText;
       if (privateChat) {
         let url = await dalle(talker.name(), imgContent) as string;
         const fileBox = FileBox.fromUrl(url)
@@ -282,6 +289,7 @@ export class ChatGPTBot {
       }
       return;
     }
+
     if (this.triggerGPTMessage(rawText, privateChat)) {
       const text = this.cleanMessage(rawText, privateChat);
       if (privateChat) {
