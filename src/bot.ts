@@ -129,10 +129,6 @@ export class ChatGPTBot {
     // remove more text via - - - - - - - - - - - - - - -
     return text
   }
-<<<<<<< HEAD
-
-=======
->>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
   async getGPTMessage(talkerName: string,text: string): Promise<string> {
     let gptMessage = await chatgpt(talkerName,text);
     if (gptMessage !=="") {
@@ -223,10 +219,7 @@ export class ChatGPTBot {
     await this.trySay(talker, gptMessage);
   }
 
-<<<<<<< HEAD
   // Group message 
-=======
->>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
   async onGroupMessage(
     talker: ContactInterface,
     text: string,
@@ -236,11 +229,8 @@ export class ChatGPTBot {
     const result = `@${talker.name()} ${text}\n\n------\n ${gptMessage}`;
     await this.trySay(room, result);
   }
-<<<<<<< HEAD
 
   // Private message
-=======
->>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
   async onMessage(message: Message) {
     const talker = message.talker();
     const rawText = message.text();
@@ -270,11 +260,8 @@ export class ChatGPTBot {
       })
       return;
     }
-<<<<<<< HEAD
 
     // Run some specific command
-=======
->>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
     if (rawText.startsWith("/cmd ")){
       console.log(`🤖 Command: ${rawText}`)
       const cmdContent = rawText.slice(5) // 「/cmd 」一共5个字符(注意空格)
@@ -286,16 +273,10 @@ export class ChatGPTBot {
       return;
     }
     // 使用DallE生成图片
-<<<<<<< HEAD
     if (rawText.includes("画")){
       console.log(`🤖 Image: ${rawText}`)
       // const imgContent = rawText.slice(4)
       const imgContent = rawText;
-=======
-    if (rawText.startsWith("/img")){
-      console.log(`🤖 Image: ${rawText}`)
-      const imgContent = rawText.slice(4)
->>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
       if (privateChat) {
         let url = await dalle(talker.name(), imgContent) as string;
         const fileBox = FileBox.fromUrl(url)
@@ -307,10 +288,6 @@ export class ChatGPTBot {
       }
       return;
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
     if (this.triggerGPTMessage(rawText, privateChat)) {
       const text = this.cleanMessage(rawText, privateChat);
       if (privateChat) {
