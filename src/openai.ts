@@ -52,7 +52,11 @@ async function dalle(username:string,prompt: string) {
   const response = await openai.createImage({
     prompt: prompt,
     n:1,
+<<<<<<< HEAD
     size: CreateImageRequestSizeEnum._512x512,
+=======
+    size: CreateImageRequestSizeEnum._256x256,
+>>>>>>> 2d5120a975af91f4fdacf2962e458f3cb7157a6f
     response_format: CreateImageRequestResponseFormatEnum.Url,
     user: username
   }).then((res) => res.data).catch((err) => console.log(err));
