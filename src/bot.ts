@@ -144,6 +144,7 @@ export class ChatGPTBot {
     }
     return config.chatgptBlockWords.some((word) => message.includes(word));
   }
+  
   // The message is segmented according to its size
   async trySay(
     talker: RoomInterface | ContactInterface,
@@ -169,7 +170,7 @@ export class ChatGPTBot {
     const { chatTriggerRule } = this;
     let triggered = false;
     if (privateChat) {
-      const regEx = this.chatPrivateTriggerRule
+      // const regEx = this.chatPrivateTriggerRule
       // triggered = regEx? regEx.test(text): true;
       // Private chat any text trigger chatgpt
       triggered = true;
@@ -211,6 +212,10 @@ export class ChatGPTBot {
       text.includes("收到转账，请在手机上查看") ||
       // 位置消息
       text.includes("/cgi-bin/mmwebwx-bin/webwxgetpubliclinkimg") ||
+      // 新加好友信息
+      text.includes("刚刚把你添加到通讯录") ||
+      // System message
+      text.includes("以上是打招呼的内容") ||
       // 聊天屏蔽词
       this.checkBlockWords(text)
     );
