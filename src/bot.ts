@@ -110,6 +110,7 @@ export class ChatGPTBot {
       await command.exec(contact, args.join(" "));
     }
   }
+
   // remove more times conversation and mention
   cleanMessage(rawText: string, privateChat: boolean = false): string {
     let text = rawText;
@@ -129,6 +130,7 @@ export class ChatGPTBot {
     // remove more text via - - - - - - - - - - - - - - -
     return text
   }
+
   async getGPTMessage(talkerName: string,text: string): Promise<string> {
     let gptMessage = await chatgpt(talkerName,text);
     if (gptMessage !=="") {
@@ -137,6 +139,7 @@ export class ChatGPTBot {
     }
     return "Sorry, please try again later. 😔";
   }
+
   // Check if the message returned by chatgpt contains masked words]
   checkChatGPTBlockWords(message: string): boolean {
     if (config.chatgptBlockWords.length == 0) {
@@ -165,6 +168,7 @@ export class ChatGPTBot {
       await talker.say(msg);
     }
   }
+
   // Check whether the ChatGPT processing can be triggered
   triggerGPTMessage(text: string, privateChat: boolean = false): boolean {
     const { chatTriggerRule } = this;
@@ -186,6 +190,7 @@ export class ChatGPTBot {
     }
     return triggered;
   }
+
   // Check whether the message contains the blocked words. if so, the message will be ignored. if so, return true
   checkBlockWords(message: string): boolean {
     if (config.blockWords.length == 0) {
@@ -237,10 +242,32 @@ export class ChatGPTBot {
     await this.trySay(room, result);
   }
 
+  async processAudioMessage(message: Message): Promise<string> {
+    // 保存语音文件
+    const fileBox = await message.toFileBox();
+    let fileName = "./public/" + fileBox.name;
+    await fileBox.toFile(fileName, true).catch((e) => {
+      console.log("保存语音失败", e);
+      return;
+    });
+    // Whisper
+    // Whisper
+    try {
+      const text = await whisper("", fileName);
+      message.say("您的问题是：" + text);
+      console.log("识别的语音是：", text);
+      return text;
+    } catch (error) {
+      console.log("Whisper 处理错误", error);
+      return "抱歉，我不是很明白。";
+    }
+    
+  }
+
   // Private message
   async onMessage(message: Message) {
     const talker = message.talker();
-    const rawText = message.text();
+    let rawText = message.text();
     const room = message.room();
     const messageType = message.type();
     const privateChat = !room;
@@ -253,19 +280,10 @@ export class ChatGPTBot {
     if (this.isNonsense(talker, messageType, rawText)) {
       return;
     }
+
+    // Process audio message
     if (messageType == MessageType.Audio){
-      // 保存语音文件
-      const fileBox = await message.toFileBox();
-      let fileName = "./public/" + fileBox.name;
-      await fileBox.toFile(fileName, true).catch((e) => {
-        console.log("保存语音失败",e);
-        return;
-      });
-      // Whisper
-      whisper("",fileName).then((text) => {
-        message.say(text);
-      })
-      return;
+      rawText = await this.processAudioMessage(message);
     }
 
     // Run some specific command
@@ -296,6 +314,9 @@ export class ChatGPTBot {
       return;
     }
     if (this.triggerGPTMessage(rawText, privateChat)) {
+      if (messageType == MessageType.Audio) {
+        rawText = rawText.slice(6);
+      }
       const text = this.cleanMessage(rawText, privateChat);
       if (privateChat) {
         return await this.onPrivateMessage(talker, text);
