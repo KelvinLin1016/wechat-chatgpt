@@ -7,6 +7,8 @@ import {
 import fs from "fs";
 import DBUtils from "./data.js";
 import {config} from "./config.js";
+import {GINKGO_CUSTOMER_SERVICE} from "./prompts.js";
+import { BotType } from "./constant.js";
 
 const configuration = new Configuration({
   apiKey: config.openai_api_key,
@@ -19,9 +21,10 @@ const openai = new OpenAIApi(configuration);
  * @param username
  * @param message
  */
-async function chatgpt(username:string,message: string): Promise<string> {
+async function chatgpt(username:string,message: string, botType:BotType): Promise<string> {
   // 先将用户输入的消息添加到数据库中
   DBUtils.addUserMessage(username, message);
+  DBUtils.setPrompt(username, botType==BotType.GinkgoCustomerService?GINKGO_CUSTOMER_SERVICE:"")
   const messages = DBUtils.getChatMessage(username);
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",

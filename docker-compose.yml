@@ -6,4 +6,4 @@ services:
     volumes:
       - ./data/wechat-assistant.memory-card.json:/app/wechat-assistant.memory-card.json
     env_file:
-      - .env
+      - .env4
